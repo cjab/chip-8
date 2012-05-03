@@ -1,0 +1,40 @@
+.container {
+  margin: 50px auto;
+  display: block;
+  width: 600px
+}
+
+.editor textarea {
+  width: 600px;
+  min-height: 300px;
+}
+
+#input-nav {
+  margin: 0 auto;
+}
+
+.navbar {
+  margin: 0 auto;
+  width 600px;
+}
+
+.upload-assembly, .upload-binary {
+  position: relative;
+  overflow: hidden;
+  float: left;
+  width: 140px;
+}
+
+.upload-assembly input, .upload-binary input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  -moz-transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+  cursor: pointer;
+}

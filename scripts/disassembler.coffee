@@ -5,15 +5,9 @@ define [
 
   class Disassembler
 
-    run: (buffer) ->
-      program = new Uint16Array(buffer)
 
-      for instruction in program
-        # Chip-8 is Big Endian, more than likely the buffer is little endian...
-        # Unfortunately endianness of the buffer array depends on the machine.
-        # TODO: Find a way to determine if the endianness needs to be fixed
-        instruction = ((instruction << 8) & 0xff00) | (instruction >>> 8)
-        @getInstruction(instruction)
+    run: (buffer) ->
+      @getInstruction(instruction) for instruction in new Uint16Array(buffer)
 
 
     getAddress:   (instruction) -> "0x#{(instruction & 0x0fff).toString(16)}"

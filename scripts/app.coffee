@@ -1,9 +1,11 @@
 define [
   "cs!disassembler"
+  "cs!views/main"
 ],
 
-(Disassembler) ->
+(Disassembler, MainView) ->
 
   initialize = ->
+    mainView = new MainView(el: '.container')
 
   return initialize: initialize

@@ -20,7 +20,7 @@ define [
       beforeEach ->
         buffer     = new ArrayBuffer(8)
         opArray    = new Uint16Array(buffer)
-        opArray.set [ 0xe000, 0x026a, 0x0c6b, 0x3f6c ]
+        opArray.set [ 0x00e0, 0x6a02, 0x6b0c, 0x6c3f ]
         #xhr = new XMLHttpRequest()
         #xhr.responseType = "arraybuffer"
         #xhr.open "GET", "/data/pong.bin"
