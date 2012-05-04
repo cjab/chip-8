@@ -7,7 +7,9 @@ define [
 
     @MEMORY_SIZE:      4096
     @PROGRAM_START:     512
-    @NUM_OF_REGISTERS:   16 + 5 # 16 general and 5 special registers
+    @REGISTERS_SIZE:     19
+    @STACK_SIZE:         16
+    @STACK_START:       255
     @INSTRUCTION_SIZE:    2
 
     @REGISTER:
@@ -27,11 +29,9 @@ define [
       VD: 0x0d
       VE: 0x0e
       VF: 0x0f
-      I:  0x10
-      PC: 0x11
-      SP: 0x12
-      DT: 0x13
-      ST: 0x14
+      SP: 0x10
+      DT: 0x11
+      ST: 0x12
 
     addr:   (instruction) -> instruction & 0x0fff
     xReg:   (instruction) -> (instruction & 0x0f00) >> 8
@@ -68,7 +68,7 @@ define [
       0x1: (i) -> @or @xReg(i), @yReg(i)
       0x2: (i) -> @and @xReg(i), @yReg(i)
       0x3: (i) -> @xor @xReg(i), @yReg(i)
-      0x4: (i) -> @add @xReg(i), @yReg(i)
+      0x4: (i) -> @add_reg_reg @xReg(i), @yReg(i)
       0x5: (i) -> @sub @xReg(i), @yReg(i)
       0x6: (i) -> @shr @xReg(i), @yReg(i)
       0x7: (i) -> @subn @xReg(i), @yReg(i)
@@ -85,7 +85,7 @@ define [
       0x0A: (i) -> @ld_reg_k @xReg(i)
       0x15: (i) -> @ld_dt_reg @xReg(i)
       0x18: (i) -> @ld_st_reg @xReg(i)
-      0x1e: (i) -> @ld_i_reg @xReg(i)
+      0x1e: (i) -> @add_i_reg @xReg(i)
       0x29: (i) -> @ld_f_reg @xReg(i)
       0x33: (i) -> @ld_b_reg @xReg(i)
       0x55: (i) -> @ld_start_x @xReg(i)
@@ -94,11 +94,14 @@ define [
 
     constructor: ->
       @memoryBuffer   = new ArrayBuffer Chip8.MEMORY_SIZE
-      @registerBuffer =
-        new ArrayBuffer Chip8.INSTRUCTION_SIZE * Chip8.NUM_OF_REGISTERS
+      @registerBuffer = new ArrayBuffer Chip8.REGISTERS_SIZE
+      @stackBuffer    = new ArrayBuffer Chip8.STACK_SIZE
       @memory    = new Uint16Array @memoryBuffer
-      @registers = new Uint16Array @registerBuffer
-      @registers[Chip8.REGISTER.PC] = Chip8.PROGRAM_START
+      @registers = new Uint8Array  @registerBuffer
+      @stack     = new Uint16Array @stackBuffer
+      @i  = 0x0000
+      @pc = Chip8.PROGRAM_START
+      @registers[Chip8.REGISTER.SP] = Chip8.STACK_START
 
 
     load: (buffer) ->
@@ -107,54 +110,141 @@ define [
 
 
     cycle: ->
-      instruction = @memory[@registers[Chip8.REGISTER.PC]]
+      instruction = @memory[@pc]
       @operations[instruction >>> 12].call(this, instruction)
-      @registers[Chip8.REGISTER.PC] += 1
+      @pc += 1
 
 
-    sys: (addr) -> console.log "SYS instruction not implemented"
-    cls: -> console.log "CLS instruction not implemented"
-    ret: -> console.log "RET instruction not implemented"
-    rnd: (xReg, byte) -> console.log "instruction not implemented"
-    drw: (xReg, yReg, nibble) -> console.log "instruction not implemented"
+    ret: ->
+      @pc = @stack[@registers[Chip8.REGISTER.SP]]
+      @registers[Chip8.REGISTER.SP] -= 1
 
 
-    or:  (xReg, yReg) -> @registers[xReg] = @registers[xReg] | @registers[yReg]
-    and: (xReg, yReg) -> @registers[xReg] = @registers[xReg] & @registers[yReg]
-    xor: (xReg, yReg) -> @registers[xReg] = @registers[xReg] ^ @registers[yReg]
-
-    shr: (xReg, yReg) -> console.log "instruction not implemented"
-    shl: (xReg, yReg) -> console.log "instruction not implemented"
-    subn: (xReg, yReg) -> console.log "instruction not implemented"
-    call: (addr) -> console.log "instruction not implemented"
+    rnd: (xReg, byte) ->
+      @registers[xReg] = Math.floor(Math.random() * 256) & byte
 
 
-    jp: (addr) -> console.log "JP instruction not implemented"
-    jp_v0_addr: (addr) -> console.log "instruction not implemented"
+    or: (xReg, yReg) ->
+      @registers[xReg] = @registers[xReg] | @registers[yReg]
 
-    se_reg_byte: (xReg, byte) -> console.log "instruction not implemented"
-    se_reg_reg:  (xReg, yReg) -> console.log "instruction not implemented"
 
-    sne_reg_byte: (xReg, byte) -> console.log "instruction not implemented"
-    sne_reg_reg:  (xReg, yReg) -> console.log "instruction not implemented"
+    and: (xReg, yReg) ->
+      @registers[xReg] = @registers[xReg] & @registers[yReg]
 
-    add: (xReg, yReg) -> console.log "instruction not implemented"
-    add_reg_byte: (xReg, byte) -> console.log "instruction not implemented"
 
-    sub: (xReg, yReg) -> console.log "instruction not implemented"
+    xor: (xReg, yReg) ->
+      @registers[xReg] = @registers[xReg] ^ @registers[yReg]
 
-    ld_i_addr: (addr) -> console.log "instruction not implemented"
-    ld_reg_byte: (xReg, byte) -> console.log "instruction not implemented"
-    ld_reg_reg: (xReg, yReg) -> console.log "instruction not implemented"
-    ld_reg_dt: (xReg) -> console.log "instruction not implemented"
+
+    shr: (xReg, yReg) ->
+      @registers[Chip8.REGISTER.VF] = @registers[xReg] & 0x01
+      @registers[xReg] = @registers[xReg] >>> 1
+
+
+    shl: (xReg, yReg) ->
+      @registers[Chip8.REGISTER.VF] = (@registers[xReg] & 0x80) >>> 7
+      @registers[xReg] = @registers[xReg] << 1
+
+
+    call: (addr) ->
+      @registers[Chip8.REGISTER.SP] += 1
+      @stack[@registers[Chip8.REGISTER.SP]] = @pc
+      @pc = addr
+
+
+    jp: (addr) ->
+      @pc = addr
+
+
+    jp_v0_addr: (addr) ->
+      @pc = @registers[Chip8.REGISTER.V0] + addr
+
+
+    se_reg_byte: (xReg, byte) ->
+      @pc += 2 if @registers[xReg] == byte
+
+
+    se_reg_reg:  (xReg, yReg) ->
+      @pc += 2 if @registers[xReg] == @registers[yReg]
+
+
+    sne_reg_byte: (xReg, byte) ->
+      @pc += 2 if @registers[xReg] != byte
+
+
+    sne_reg_reg:  (xReg, yReg) ->
+      @pc += 2 if @registers[xReg] != @registers[yReg]
+
+
+    add_reg_reg: (xReg, yReg) ->
+      result = @registers[xReg] + @registers[yReg]
+      @registers[Chip8.REGISTER.VF] = (result > 0xff)
+      @registers[xReg] = result
+
+
+    add_reg_byte: (xReg, byte) ->
+      @registers[xReg] = @registers[xReg] + byte
+
+
+    add_i_reg: (xReg) ->
+      @i += @registers[xReg]
+
+
+    sub: (xReg, yReg) ->
+      @registers[Chip8.REGISTER.VF] = (@registers[xReg] > @registers[yReg])
+      @registers[xReg] = @registers[xReg] - @registers[yReg]
+
+
+    subn: (xReg, yReg) ->
+      @registers[Chip8.REGISTER.VF] = (@registers[yReg] > @registers[xReg])
+      @registers[xReg] = @registers[yReg] - @registers[xReg]
+
+
+    ld_i_addr: (addr) ->
+      @i = addr
+
+
+    ld_reg_byte: (xReg, byte) ->
+      @registers[xReg] = byte
+
+
+    ld_reg_reg: (xReg, yReg) ->
+      @registers[xReg] = @registers[yReg]
+
+
+    ld_reg_dt: (xReg) ->
+      @registers[xReg] = @registers[Chip8.REGISTER.DT]
+
+
+    ld_dt_reg: (xReg) ->
+      @registers[Chip8.REGISTER.DT] = @registers[xReg]
+
+
+    ld_st_reg: (xReg) ->
+      @registers[Chip8.REGISTER.ST] = @registers[xReg]
+
+
+    ld_b_reg: (xReg) ->
+      val = @registers[xReg]
+      hundreds = @memory[@i] = Math.floor(val / 100)
+      val -= hundreds * 100
+      tens     = @memory[@i + 1] = Math.floor(val / 10)
+      val -= tens * 10
+      ones     = @memory[@i + 2] = val
+
+
+    ld_start_reg: (xReg) ->
+      @memory[@i + i] = @registers[i] for i in [Chip8.REGISTER.V0..xReg]
+
+
+    ld_reg_start: (xReg) ->
+      @registers[i] = @memory[@i + i] for i in [Chip8.REGISTER.V0..xReg]
+
+
     ld_reg_k:  (xReg) -> console.log "instruction not implemented"
-    ld_dt_reg: (xReg) -> console.log "instruction not implemented"
-    ld_st_reg: (xReg) -> console.log "instruction not implemented"
-    ld_i_reg:  (xReg) -> console.log "instruction not implemented"
     ld_f_reg:  (xReg) -> console.log "instruction not implemented"
-    ld_b_reg:  (xReg) -> console.log "instruction not implemented"
-    ld_start_reg: (xReg) -> console.log "instruction not implemented"
-    ld_reg_start: (xReg) -> console.log "instruction not implemented"
-
     skp: (xReg) -> console.log "instruction not implemented"
     skpnp: (xReg) -> console.log "instruction not implemented"
+    sys: (addr) -> console.log "SYS instruction not implemented"
+    cls: -> console.log "CLS instruction not implemented"
+    drw: (xReg, yReg, nibble) -> console.log "instruction not implemented"
