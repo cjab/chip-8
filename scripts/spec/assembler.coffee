@@ -22,17 +22,17 @@ define [
         expect(assembler.toArrayBuffer(program).byteLength).toEqual(6)
 
 
-    it "should work", ->
-      program = ""
-      xhr = new XMLHttpRequest()
-      xhr.open "GET", "/data/pong.asm"
-      xhr.onload = (e) -> program = xhr.responseText
-      xhr.send()
-      waitsFor -> xhr.readyState == 4
+    #it "should work", ->
+    #  program = ""
+    #  xhr = new XMLHttpRequest()
+    #  xhr.open "GET", "/data/pong.asm"
+    #  xhr.onload = (e) -> program = xhr.responseText
+    #  xhr.send()
+    #  waitsFor -> xhr.readyState == 4
 
-      runs ->
-        assembler.run(program)
-        console.log("0x#{i.toString(16)}") for i in assembler.program
+    #  runs ->
+    #    assembler.run(program)
+    #    console.log("0x#{i.toString(16)}") for i in assembler.program
 
     it "should assemble CLS", ->
       expect(assembler.run("CLS")[0]).toEqual 0x00e0
