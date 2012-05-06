@@ -12,6 +12,12 @@ define [
       display = new Display
 
 
+    describe "#byteWidth", ->
+
+      it "should return the number of bytes on the x-axis", ->
+        expect(display.byteWidth()).toEqual(8)
+
+
     describe "#isClear", ->
 
       it "should return true if the screen buffer is empty (all 0's)", ->

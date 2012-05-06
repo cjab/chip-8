@@ -33,7 +33,10 @@ define [
       @buffer = new Uint8Array(new ArrayBuffer((@width / 8) * @height))
 
 
-    size: -> (@width / 8) * @height
+    size: -> @byteWidth() * @height
+
+
+    byteWidth: -> @width / 8
 
 
     isClear: ->
@@ -45,7 +48,7 @@ define [
     clear: -> @buffer[i] = 0x00 for i in [0..@size()]
 
 
-    byteOffset: (x, y) -> (y * (@width / 8)) + Math.floor(x / 8)
+    byteOffset: (x, y) -> (y * @byteWidth()) + Math.floor(x / 8)
 
 
     bitOffset: (x, y) -> x & 0x07
@@ -59,15 +62,15 @@ define [
 
       for i in [0..(sprite.byteLength - 1)]
         # Modulus size to create wrapping of sprites on the y-axis
-        target     = (byteOffset + (i * (@width / 8))) % @size()
+        target     = (byteOffset + (i * @byteWidth())) % @size()
         spriteData = offsetSprite[i]
 
-        if (target % (@width / 8)) == (@width / 8) - 1
+        if (target % @byteWidth()) == @byteWidth() - 1
           # This means that the sprite has wrapped to the other side of the
           # screen. The 16-bit wide sprite must be broken in half. One byte
           # should be drawn on each side of the screen.
           targetRight = target
-          targetLeft  = target - ((@width / 8) - 1)
+          targetLeft  = target - (@byteWidth() - 1)
           existingRight = bufferView.getUint8(targetRight)
           existingLeft  = bufferView.getUint8(targetLeft)
           spriteDataRight = spriteData >>> 8
