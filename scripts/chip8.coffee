@@ -1,7 +1,8 @@
 define [
+  "cs!display"
 ],
 
-() ->
+(Display) ->
 
   class Chip8
 
@@ -93,12 +94,10 @@ define [
 
 
     constructor: ->
-      @memoryBuffer   = new ArrayBuffer Chip8.MEMORY_SIZE
-      @registerBuffer = new ArrayBuffer Chip8.REGISTERS_SIZE
-      @stackBuffer    = new ArrayBuffer Chip8.STACK_SIZE
-      @memory    = new Uint16Array @memoryBuffer
-      @registers = new Uint8Array  @registerBuffer
-      @stack     = new Uint16Array @stackBuffer
+      @display   = new Display()
+      @memory    = new Uint16Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
+      @registers = new Uint8Array(new ArrayBuffer(Chip8.REGISTERS_SIZE))
+      @stack     = new Uint16Array(new ArrayBuffer(Chip8.STACK_SIZE))
       @i  = 0x0000
       @pc = Chip8.PROGRAM_START
       @registers[Chip8.REGISTER.SP] = Chip8.STACK_START
@@ -152,24 +151,20 @@ define [
       @pc = addr
 
 
-    jp: (addr) ->
-      @pc = addr
+    jp: (addr) -> @pc = addr
 
 
-    jp_v0_addr: (addr) ->
-      @pc = @registers[Chip8.REGISTER.V0] + addr
+    jp_v0_addr: (addr) -> @pc = @registers[Chip8.REGISTER.V0] + addr
 
 
-    se_reg_byte: (xReg, byte) ->
-      @pc += 2 if @registers[xReg] == byte
+    se_reg_byte: (xReg, byte) -> @pc += 2 if @registers[xReg] == byte
 
 
     se_reg_reg:  (xReg, yReg) ->
       @pc += 2 if @registers[xReg] == @registers[yReg]
 
 
-    sne_reg_byte: (xReg, byte) ->
-      @pc += 2 if @registers[xReg] != byte
+    sne_reg_byte: (xReg, byte) -> @pc += 2 if @registers[xReg] != byte
 
 
     sne_reg_reg:  (xReg, yReg) ->
@@ -182,12 +177,10 @@ define [
       @registers[xReg] = result
 
 
-    add_reg_byte: (xReg, byte) ->
-      @registers[xReg] = @registers[xReg] + byte
+    add_reg_byte: (xReg, byte) -> @registers[xReg] = @registers[xReg] + byte
 
 
-    add_i_reg: (xReg) ->
-      @i += @registers[xReg]
+    add_i_reg: (xReg) -> @i += @registers[xReg]
 
 
     sub: (xReg, yReg) ->
@@ -200,28 +193,22 @@ define [
       @registers[xReg] = @registers[yReg] - @registers[xReg]
 
 
-    ld_i_addr: (addr) ->
-      @i = addr
+    ld_i_addr: (addr) -> @i = addr
 
 
-    ld_reg_byte: (xReg, byte) ->
-      @registers[xReg] = byte
+    ld_reg_byte: (xReg, byte) -> @registers[xReg] = byte
 
 
-    ld_reg_reg: (xReg, yReg) ->
-      @registers[xReg] = @registers[yReg]
+    ld_reg_reg: (xReg, yReg) -> @registers[xReg] = @registers[yReg]
 
 
-    ld_reg_dt: (xReg) ->
-      @registers[xReg] = @registers[Chip8.REGISTER.DT]
+    ld_reg_dt: (xReg) -> @registers[xReg] = @registers[Chip8.REGISTER.DT]
 
 
-    ld_dt_reg: (xReg) ->
-      @registers[Chip8.REGISTER.DT] = @registers[xReg]
+    ld_dt_reg: (xReg) -> @registers[Chip8.REGISTER.DT] = @registers[xReg]
 
 
-    ld_st_reg: (xReg) ->
-      @registers[Chip8.REGISTER.ST] = @registers[xReg]
+    ld_st_reg: (xReg) -> @registers[Chip8.REGISTER.ST] = @registers[xReg]
 
 
     ld_b_reg: (xReg) ->
@@ -241,10 +228,20 @@ define [
       @registers[i] = @memory[@i + i] for i in [Chip8.REGISTER.V0..xReg]
 
 
+    cls: -> @display.clear()
+
+
+    drw: (xReg, yReg, nibble) ->
+      x = @registers[xReg]
+      y = @registers[yReg]
+      sprite = new Uint8Array(new ArrayBuffer(nibble))
+      sprite[i] = @memory[@i + i] for i in [0..(nibble - 1)]
+      collision = @display.drawSprite(x, y, sprite.buffer)
+      @registers[Chip8.REGISTER.VF] = collision
+
+
     ld_reg_k:  (xReg) -> console.log "instruction not implemented"
     ld_f_reg:  (xReg) -> console.log "instruction not implemented"
     skp: (xReg) -> console.log "instruction not implemented"
     skpnp: (xReg) -> console.log "instruction not implemented"
     sys: (addr) -> console.log "SYS instruction not implemented"
-    cls: -> console.log "CLS instruction not implemented"
-    drw: (xReg, yReg, nibble) -> console.log "instruction not implemented"

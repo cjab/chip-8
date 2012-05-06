@@ -418,3 +418,42 @@ define [
         expect(chip8.registers[Chip8.REGISTER.V0]).toEqual 0x05
         expect(chip8.registers[Chip8.REGISTER.V1]).toEqual 0x1f
         expect(chip8.registers[Chip8.REGISTER.V2]).toEqual 0x5c
+
+
+    describe "#cls", ->
+
+      it "should clear the display buffer", ->
+        chip8.display.buffer[3] = 0xff
+        chip8.cls()
+        expect(chip8.display.isClear()).toBe(true)
+
+
+    describe "#drw", ->
+
+      it "should draw to the display", ->
+        chip8.i = 1024
+        chip8.registers[Chip8.REGISTER.V0] = 0
+        chip8.registers[Chip8.REGISTER.V1] = 0
+        chip8.memory.set [ 0xff, 0xff, 0xff, 0xff, 0xff ], 1024
+
+        chip8.drw(Chip8.REGISTER.V0, Chip8.REGISTER.V1, 0x5)
+        expect(chip8.display.isClear()).toBe(false)
+
+      it "should set VF to 1 if there is a collision", ->
+        chip8.i = 1024
+        chip8.registers[Chip8.REGISTER.V0] = 0
+        chip8.registers[Chip8.REGISTER.V1] = 0
+        chip8.memory.set [ 0xff, 0xff, 0xff, 0xff, 0xff ], 1024
+
+        chip8.drw(Chip8.REGISTER.V0, Chip8.REGISTER.V1, 0x5)
+        chip8.drw(Chip8.REGISTER.V0, Chip8.REGISTER.V1, 0x5)
+        expect(chip8.registers[Chip8.REGISTER.VF]).toBe(1)
+
+      it "should set VF to 0 if there is NOT a collision", ->
+        chip8.i = 1024
+        chip8.registers[Chip8.REGISTER.V0] = 0
+        chip8.registers[Chip8.REGISTER.V1] = 0
+        chip8.memory.set [ 0xff, 0xff, 0xff, 0xff, 0xff ], 1024
+
+        chip8.drw(Chip8.REGISTER.V0, Chip8.REGISTER.V1, 0x5)
+        expect(chip8.registers[Chip8.REGISTER.VF]).toBe(0)
