@@ -58,7 +58,8 @@ define [
       collision    = 0
 
       for i in [0..(sprite.byteLength - 1)]
-        target     = byteOffset + (i * (@width / 8))
+        # Modulus size to create wrapping of sprites on the y-axis
+        target     = (byteOffset + (i * (@width / 8))) % @size()
         spriteData = offsetSprite[i]
 
         if (target % (@width / 8)) == (@width / 8) - 1

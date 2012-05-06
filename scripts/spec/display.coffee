@@ -86,7 +86,11 @@ define [
           expect(display.buffer[(display.width / 8) - 1]).toEqual(0x01)
 
         it "should wrap a sprite on the y axis", ->
-          expect(false).toBeTruthy()
+          sprite = new Uint8Array(new ArrayBuffer(5))
+          sprite.set [ 0xff, 0xff, 0xff, 0xff, 0xff ]
+          display.drawSprite(0, display.height - 1, sprite)
+          expect(display.buffer[0]).toEqual(0xff)
+          expect(display.buffer[(display.width / 8) * (display.height - 1)]).toEqual(0xff)
 
         it "should return false if there is no collision", ->
           sprite = new Uint8Array(new ArrayBuffer(5))
