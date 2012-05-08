@@ -1,9 +1,10 @@
 define [
   "jQuery"
   "cs!chip8"
+  "cs!util"
 ],
 
-($, Chip8) ->
+($, Chip8, Util) ->
 
   describe "Chip8", ->
 
@@ -11,6 +12,26 @@ define [
 
     beforeEach ->
       chip8 = new Chip8
+
+
+    describe "#run", ->
+
+      program = null
+
+      beforeEach ->
+        xhr = new XMLHttpRequest()
+        xhr.responseType = "arraybuffer"
+        xhr.open "GET", "/data/blinky.bin"
+        xhr.onload = (e) ->
+          program = xhr.response
+        xhr.send()
+        waitsFor -> xhr.readyState == 4
+
+      it "should work", ->
+        runs ->
+          chip8.load program
+          chip8.run()
+
 
 
     describe "#addr", ->
@@ -47,10 +68,10 @@ define [
 
       it "should load a program into memory at the program start address", ->
         buffer = new ArrayBuffer 4
-        program = new Uint16Array buffer
-        program[0] = 0x1234
+        program = new Uint8Array buffer
+        program[0] = 0x12
         chip8.load(buffer)
-        expect(chip8.memory[Chip8.PROGRAM_START]).toEqual 0x1234
+        expect(chip8.memory[Chip8.PROGRAM_START]).toEqual 0x12
 
 
     describe "#cycle", ->
@@ -62,7 +83,7 @@ define [
         chip8.load(buffer)
 
       it "works", ->
-        chip8.cycle()
+        #chip8.cycle()
 
 
     describe "#or", ->

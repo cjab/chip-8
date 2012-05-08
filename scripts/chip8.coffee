@@ -110,7 +110,7 @@ define [
       0x1e: (i) -> @add_i_reg @xReg(i)
       0x29: (i) -> @ld_f_reg @xReg(i)
       0x33: (i) -> @ld_b_reg @xReg(i)
-      0x55: (i) -> @ld_start_x @xReg(i)
+      0x55: (i) -> @ld_start_reg @xReg(i)
       0x65: (i) -> @ld_reg_start @xReg(i)
 
 
@@ -125,10 +125,15 @@ define [
       @waitingForInput = false
 
 
-    initMemory: -> @memory = new Uint16Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
+    run: ->
+      @running = true
+      @interval = setInterval(@cycle, 500)
 
 
-    initFonts: -> @memory.set @display.buildFonts()
+    initMemory: -> @memory = new Uint8Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
+
+
+    initFonts: -> (new Uint8Array(@memory.buffer)).set @display.buildFonts()
 
 
     initDisplay: -> @display = new Display()
@@ -145,14 +150,18 @@ define [
 
 
     load: (buffer) ->
-      program = new Uint16Array buffer
+      program = new Uint8Array buffer
       @memory.set program, Chip8.PROGRAM_START
 
 
-    cycle: ->
-      instruction = @memory[@pc]
+    cycle: =>
+      clearInterval(@interval) unless @running
+      highByte = @memory[@pc]
+      lowByte  = @memory[@pc + 1]
+      instruction = (highByte << 8) | lowByte
       @operations[instruction >>> 12].call(this, instruction)
-      @pc += 1
+      @pc += 2
+      running = false if @pc > Chip8.MEMORY_SIZE
 
 
     ret: ->
@@ -310,4 +319,6 @@ define [
       @i = @registers[xReg] * Display.FONT_HEIGHT
 
 
-    sys: (addr) -> console.log "SYS instruction not implemented"
+    sys: (addr) ->
+      console.log "SYS instruction not implemented"
+      @running = false
