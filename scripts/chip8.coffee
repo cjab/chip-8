@@ -1,8 +1,9 @@
 define [
   "cs!display"
+  "keyboard"
 ],
 
-(Display) ->
+(Display, Keyboard) ->
 
   class Chip8
 
@@ -33,6 +34,26 @@ define [
       SP: 0x10
       DT: 0x11
       ST: 0x12
+
+
+    @KEY_MAP:
+      0x0: "1"
+      0x1: "2"
+      0x2: "3"
+      0x3: "4"
+      0x4: "q"
+      0x5: "w"
+      0x6: "e"
+      0x7: "r"
+      0x8: "a"
+      0x9: "s"
+      0xa: "d"
+      0xb: "f"
+      0xc: "z"
+      0xd: "x"
+      0xe: "c"
+      0xf: "v"
+
 
     addr:   (instruction) -> instruction & 0x0fff
     xReg:   (instruction) -> (instruction & 0x0f00) >> 8
@@ -78,7 +99,7 @@ define [
 
     skpOperations:
       0x9e: (i) -> @skp @xReg(i)
-      0xa1: (i) -> @skpnp @xReg(i)
+      0xa1: (i) -> @sknp @xReg(i)
 
 
     loadOperations:
@@ -94,10 +115,30 @@ define [
 
 
     constructor: ->
-      @display   = new Display()
-      @memory    = new Uint16Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
+      @initRegisters()
+      @initMemory()
+      @initStack()
+      @initDisplay()
+      @initMemory()
+      @initFonts()
+
+      @waitingForInput = false
+
+
+    initMemory: -> @memory = new Uint16Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
+
+
+    initFonts: -> @memory.set @display.buildFonts()
+
+
+    initDisplay: -> @display = new Display()
+
+
+    initStack: -> @stack = new Uint16Array(new ArrayBuffer(Chip8.STACK_SIZE))
+
+
+    initRegisters: ->
       @registers = new Uint8Array(new ArrayBuffer(Chip8.REGISTERS_SIZE))
-      @stack     = new Uint16Array(new ArrayBuffer(Chip8.STACK_SIZE))
       @i  = 0x0000
       @pc = Chip8.PROGRAM_START
       @registers[Chip8.REGISTER.SP] = Chip8.STACK_START
@@ -215,9 +256,9 @@ define [
       val = @registers[xReg]
       hundreds = @memory[@i] = Math.floor(val / 100)
       val -= hundreds * 100
-      tens     = @memory[@i + 1] = Math.floor(val / 10)
+      tens = @memory[@i + 1] = Math.floor(val / 10)
       val -= tens * 10
-      ones     = @memory[@i + 2] = val
+      ones = @memory[@i + 2] = val
 
 
     ld_start_reg: (xReg) ->
@@ -240,8 +281,33 @@ define [
       @registers[Chip8.REGISTER.VF] = collision
 
 
-    ld_reg_k:  (xReg) -> console.log "instruction not implemented"
-    ld_f_reg:  (xReg) -> console.log "instruction not implemented"
-    skp: (xReg) -> console.log "instruction not implemented"
-    skpnp: (xReg) -> console.log "instruction not implemented"
+    skp: (xReg) ->
+      for key in Keyboard.activeKeys()
+        @pc += 2 if key == Chip8.KEY_MAP[@registers[xReg]]
+
+
+    sknp: (xReg) ->
+      for key in Keyboard.activeKeys()
+        return if key == Chip8.KEY_MAP[@registers[xReg]]
+      @pc += 2
+
+
+    ld_reg_k:  (xReg) ->
+      @waitingForInput = true
+
+      @didGetInput = (event) =>
+        keyPressed = String.fromCharCode(event.keyCode || event.keyLocation)
+        for own value, key of Chip8.KEY_MAP
+          if key == keyPressed
+            @waitingForInput  = false
+            @registers[xReg]  = value
+            document.removeEventListener "keydown", @didGetInput
+
+      document.addEventListener "keydown", @didGetInput
+
+
+    ld_f_reg:  (xReg) ->
+      @i = @registers[xReg] * Display.FONT_HEIGHT
+
+
     sys: (addr) -> console.log "SYS instruction not implemented"

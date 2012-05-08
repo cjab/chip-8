@@ -5,6 +5,7 @@ require.config({
     Backbone:     "lib/backbone/backbone",
     CoffeeScript: "lib/coffeescript/coffeescript",
     bootstrap:    "lib/bootstrap/bootstrap",
+    keyboard:     "lib/keyboard/keyboard",
     cs:           "lib/require/cs",
     text:         "lib/require/text",
     order:        "lib/require/order",

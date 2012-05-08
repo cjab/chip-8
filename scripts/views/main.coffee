@@ -10,8 +10,9 @@ define [
 
 ($, _, Backbone, Util, EditorView, Program, mainTemplate) ->
 
-  URL = webkitURL || URL
-  BlobBuilder = BlobBuilder || WebKitBlobBuilder || MozBlobBuilder
+  URL = window.webkitURL || window.URL
+  BlobBuilder = window.BlobBuilder ||
+    window.WebKitBlobBuilder || window.MozBlobBuilder
 
   class MainView extends Backbone.View
 

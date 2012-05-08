@@ -8,7 +8,8 @@ define [
 
 (_, Backbone, Util, Assembler, Disassembler) ->
 
-  BlobBuilder = BlobBuilder || WebKitBlobBuilder || MozBlobBuilder
+  BlobBuilder = window.BlobBuilder ||
+    window.WebKitBlobBuilder || window.MozBlobBuilder
 
   class Program extends Backbone.Model
 

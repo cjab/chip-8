@@ -1,8 +1,9 @@
 define [
+  "jQuery"
   "cs!chip8"
 ],
 
-(Chip8) ->
+($, Chip8) ->
 
   describe "Chip8", ->
 
@@ -457,3 +458,110 @@ define [
 
         chip8.drw(Chip8.REGISTER.V0, Chip8.REGISTER.V1, 0x5)
         expect(chip8.registers[Chip8.REGISTER.VF]).toBe(0)
+
+
+    describe "#skp", ->
+
+      describe "while holding a key", ->
+
+        beforeEach ->
+          evt = document.createEvent("KeyboardEvent")
+          evt.initKeyboardEvent("keydown",
+            true, true, null, 49, 49, false, false, 0, 0)
+          document.dispatchEvent(evt)
+
+        afterEach ->
+          evt = document.createEvent("KeyboardEvent")
+          evt.initKeyboardEvent("keyup",
+            true, true, null, 49, 49, false, false, 0, 0)
+          document.dispatchEvent(evt)
+
+        it "should increment the program counter by two if key is pressed", ->
+          pc = chip8.pc
+          chip8.skp(0x0)
+          expect(chip8.pc).toEqual(pc + 2)
+
+      describe "while NOT holding a key", ->
+
+        it "should not increment the program counter if key is NOT pressed", ->
+          pc = chip8.pc
+          chip8.skp(0x0)
+          expect(chip8.pc).toEqual(pc)
+
+
+    describe "#sknp", ->
+
+      describe "while holding a key", ->
+
+        beforeEach ->
+          evt = document.createEvent("KeyboardEvent")
+          evt.initKeyboardEvent("keydown",
+            true, true, null, 49, 49, false, false, 0, 0)
+          document.dispatchEvent(evt)
+
+        afterEach ->
+          evt = document.createEvent("KeyboardEvent")
+          evt.initKeyboardEvent("keyup",
+            true, true, null, 49, 49, false, false, 0, 0)
+          document.dispatchEvent(evt)
+
+        it "should not increment the program counter if key is NOT pressed", ->
+          pc = chip8.pc
+          chip8.sknp(0x0)
+          expect(chip8.pc).toEqual(pc)
+
+      describe "while NOT holding a key", ->
+
+        it "should increment the program counter by two if key is pressed", ->
+          pc = chip8.pc
+          chip8.sknp(0x0)
+          expect(chip8.pc).toEqual(pc + 2)
+
+
+    describe "#ld_reg_k", ->
+
+      it "should stop execution by setting the waitingForInput flag", ->
+        chip8.ld_reg_k(Chip8.REGISTER.V0)
+        expect(chip8.waitingForInput).toBeTruthy()
+
+      it "should reset the waitingForInput flag when a key is pressed", ->
+        chip8.ld_reg_k(Chip8.REGISTER.V0)
+
+        # Press key
+        evt = document.createEvent("KeyboardEvent")
+        evt.initKeyboardEvent("keydown",
+          true, true, null, 49, 49, false, false, 0, 0)
+        document.dispatchEvent(evt)
+
+        expect(chip8.waitingForInput).toBeFalsy()
+
+        # Release key
+        evt = document.createEvent("KeyboardEvent")
+        evt.initKeyboardEvent("keyup",
+          true, true, null, 49, 49, false, false, 0, 0)
+        document.dispatchEvent(evt)
+
+      it "should store the value of the key when a key is pressed", ->
+        chip8.ld_reg_k(Chip8.REGISTER.V0)
+
+        # Press key
+        evt = document.createEvent("KeyboardEvent")
+        evt.initKeyboardEvent("keydown",
+          true, true, null, 50, 50, false, false, 0, 0)
+        document.dispatchEvent(evt)
+
+        expect(chip8.registers[Chip8.REGISTER.V0]).toEqual(0x01)
+
+        # Release key
+        evt = document.createEvent("KeyboardEvent")
+        evt.initKeyboardEvent("keyup",
+          true, true, null, 50, 50, false, false, 0, 0)
+        document.dispatchEvent(evt)
+
+
+    describe "#ld_f_reg", ->
+
+      it "should store the location of font in I register", ->
+        chip8.registers[Chip8.REGISTER.V0] = 0x0a
+        chip8.ld_f_reg(Chip8.REGISTER.V0)
+        expect(chip8.i).toEqual(0x32)

@@ -122,3 +122,9 @@ define [
         expect(resultArray[2]).toEqual(0x4800)
         expect(resultArray[3]).toEqual(0x4800)
         expect(resultArray[4]).toEqual(0x7800)
+
+
+    describe "#buildFonts", ->
+
+      it "should build and return an array of font data", ->
+        expect(display.buildFonts()[0]).toEqual(0xf0)
