@@ -5,8 +5,8 @@ define [
 
   class Display
 
-    @HEIGHT: 32 # pixels
     @WIDTH:  64 # pixels
+    @HEIGHT: 32 # pixels
 
     @FONT_HEIGHT: 5
 

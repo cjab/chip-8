@@ -159,6 +159,7 @@ define [
       highByte = @memory[@pc]
       lowByte  = @memory[@pc + 1]
       instruction = (highByte << 8) | lowByte
+      #console.log "[#{@pc}] #{instruction.toString(16)}"
       @operations[instruction >>> 12].call(this, instruction)
       @pc += 2
       running = false if @pc > Chip8.MEMORY_SIZE
@@ -301,7 +302,7 @@ define [
       @pc += 2
 
 
-    ld_reg_k:  (xReg) ->
+    ld_reg_k: (xReg) ->
       @waitingForInput = true
 
       @didGetInput = (event) =>
@@ -315,8 +316,7 @@ define [
       document.addEventListener "keydown", @didGetInput
 
 
-    ld_f_reg:  (xReg) ->
-      @i = @registers[xReg] * Display.FONT_HEIGHT
+    ld_f_reg: (xReg) -> @i = @registers[xReg] * Display.FONT_HEIGHT
 
 
     sys: (addr) ->

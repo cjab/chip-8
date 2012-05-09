@@ -21,7 +21,7 @@ define [
       beforeEach ->
         xhr = new XMLHttpRequest()
         xhr.responseType = "arraybuffer"
-        xhr.open "GET", "/data/blinky.bin"
+        xhr.open "GET", "/data/pong.bin"
         xhr.onload = (e) ->
           program = xhr.response
         xhr.send()
