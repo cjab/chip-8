@@ -33,6 +33,40 @@ define [
           chip8.run()
 
 
+    describe "#updateTimers", ->
+
+      it "should decrement dt at the frequency of 60Hz", ->
+        chip8.registers[Chip8.REGISTER.DT] = 255
+        chip8.updateTimers()
+        step = (Chip8.CLOCK_FREQUENCY / 1000) * Chip8.TIMER_FREQUENCY
+        expect(chip8.registers[Chip8.REGISTER.DT]).toEqual(255 - step)
+
+      it "should decrement st at the frequency of 60Hz", ->
+        chip8.registers[Chip8.REGISTER.ST] = 255
+        chip8.updateTimers()
+        step = (Chip8.CLOCK_FREQUENCY / 1000) * Chip8.TIMER_FREQUENCY
+        expect(chip8.registers[Chip8.REGISTER.ST]).toEqual(255 - step)
+
+      it "should not decrement dt timer if it is 0", ->
+        chip8.registers[Chip8.REGISTER.DT] = 0
+        chip8.updateTimers()
+        expect(chip8.registers[Chip8.REGISTER.DT]).toEqual(0)
+
+      it "should not decrement st timer if it is 0", ->
+        chip8.registers[Chip8.REGISTER.ST] = 0
+        chip8.updateTimers()
+        expect(chip8.registers[Chip8.REGISTER.ST]).toEqual(0)
+
+      it "should set dt timer to 0 if decrementing would make it negative", ->
+        chip8.registers[Chip8.REGISTER.DT] = 1
+        chip8.updateTimers()
+        expect(chip8.registers[Chip8.REGISTER.DT]).toEqual(0)
+
+      it "should set st timer to 0 if decrementing would make it negative", ->
+        chip8.registers[Chip8.REGISTER.ST] = 1
+        chip8.updateTimers()
+        expect(chip8.registers[Chip8.REGISTER.ST]).toEqual(0)
+
 
     describe "#addr", ->
 

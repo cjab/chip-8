@@ -13,6 +13,8 @@ define [
     @STACK_SIZE:         16
     @STACK_START:       255
     @INSTRUCTION_SIZE:    2
+    @TIMER_FREQUENCY:    60 # Hz
+    @CLOCK_FREQUENCY:   500 # ms
 
     @REGISTER:
       V0: 0x00
@@ -127,7 +129,7 @@ define [
 
     run: ->
       @running = true
-      @interval = setInterval(@cycle, 500)
+      @pcInterval = setInterval(@cycle, Chip8.CLOCK_FREQUENCY)
 
 
     initMemory: -> @memory = new Uint8Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
@@ -154,15 +156,37 @@ define [
       @memory.set program, Chip8.PROGRAM_START
 
 
+    updateTimers: =>
+      secondsPassed = Chip8.CLOCK_FREQUENCY / 1000
+      step = Math.floor(secondsPassed * Chip8.TIMER_FREQUENCY)
+
+      dt = @registers[Chip8.REGISTER.DT]
+      st = @registers[Chip8.REGISTER.ST]
+
+      if (dt - step) < 0
+        @registers[Chip8.REGISTER.DT] = 0x00
+      else
+        @registers[Chip8.REGISTER.DT] -= step
+
+      if (st - step) < 0
+        @registers[Chip8.REGISTER.ST] = 0x00
+      else
+        @registers[Chip8.REGISTER.ST] -= step
+
+
     cycle: =>
-      clearInterval(@interval) unless @running
+      @updateTimers()
+
       highByte = @memory[@pc]
       lowByte  = @memory[@pc + 1]
       instruction = (highByte << 8) | lowByte
+
       #console.log "[#{@pc}] #{instruction.toString(16)}"
       @operations[instruction >>> 12].call(this, instruction)
       @pc += 2
+
       running = false if @pc > Chip8.MEMORY_SIZE
+      clearInterval(@pcInterval) unless @running
 
 
     ret: ->
