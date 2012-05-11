@@ -21,7 +21,7 @@ define [
       beforeEach ->
         xhr = new XMLHttpRequest()
         xhr.responseType = "arraybuffer"
-        xhr.open "GET", "/data/pong.bin"
+        xhr.open "GET", "/data/blinky.bin"
         xhr.onload = (e) ->
           program = xhr.response
         xhr.send()
@@ -35,16 +35,16 @@ define [
 
     describe "#updateTimers", ->
 
-      it "should decrement dt at the frequency of 60Hz", ->
+      it "should decrement dt by 5 every cycle", ->
         chip8.registers[Chip8.REGISTER.DT] = 255
         chip8.updateTimers()
-        step = (Chip8.CLOCK_FREQUENCY / 1000) * Chip8.TIMER_FREQUENCY
+        step = 5
         expect(chip8.registers[Chip8.REGISTER.DT]).toEqual(255 - step)
 
-      it "should decrement st at the frequency of 60Hz", ->
+      it "should decrement st by 5 every cycle", ->
         chip8.registers[Chip8.REGISTER.ST] = 255
         chip8.updateTimers()
-        step = (Chip8.CLOCK_FREQUENCY / 1000) * Chip8.TIMER_FREQUENCY
+        step = 5
         expect(chip8.registers[Chip8.REGISTER.ST]).toEqual(255 - step)
 
       it "should not decrement dt timer if it is 0", ->
@@ -280,16 +280,16 @@ define [
 
     describe "#jp", ->
 
-      it "should set the program counter", ->
+      it "should set the program counter - 2 to account for next cycle", ->
         chip8.jp(0x2ff)
-        expect(chip8.pc).toEqual 0x2ff
+        expect(chip8.pc).toEqual 0x2ff - 2
 
 
     describe "#call", ->
 
-      it "should set the program counter to the address", ->
+      it "should set the program counter to the address - 2 to account for next cycle", ->
         chip8.call(0x2ff)
-        expect(chip8.pc).toEqual 0x2ff
+        expect(chip8.pc).toEqual 0x2ff - 2
 
       it "should increment the stack pointer", ->
         chip8.call(0x2ff)
@@ -391,10 +391,10 @@ define [
 
     describe "#jp_v0_addr", ->
 
-      it "should set the program counter to V0 + addr", ->
+      it "should set the program counter to V0 + addr - 2", ->
         chip8.registers[Chip8.REGISTER.V0] = 0x05
         chip8.jp_v0_addr(0x03)
-        expect(chip8.pc).toEqual 0x8
+        expect(chip8.pc).toEqual 0x8 - 2
 
 
     describe "#rnd", ->

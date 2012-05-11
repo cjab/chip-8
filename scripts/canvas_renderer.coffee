@@ -9,10 +9,17 @@ define [
 
 
     constructor: ->
+      @rawImage = $("<canvas width='64' height='32' />")[0]
       @width  = 512
       @height = 256
-      @$el = $("<canvas id='display' width='#{@width}' height='#{@height}' />")
-      $('body').prepend @$el
+      if $("canvas#display").length > 0
+        @$el = $("canvas#display")
+      else
+        @$el = $("<canvas id='display' width='#{@width}' height='#{@height}' />")
+        $('body').prepend @$el
+      context = @getContext()
+      # TODO: Find a better way to scale the canvas
+      context.scale 8, 8
 
 
     getContext: -> @$el[0].getContext('2d')
@@ -28,9 +35,10 @@ define [
       context.fillRect(0, 0, @width, @height)
       context.fillStyle = "rgb(125, 125, 125)"
 
-      image = $("<canvas width='64' height='32' />")[0]
-      imageContext = image.getContext('2d')
-      imageData    = imageContext.getImageData(0, 0, 64, 32)
+      imageContext = @rawImage.getContext('2d')
+      imageContext.fillStyle = "rgb(0, 0, 0)"
+      imageContext.fillRect(0, 0, width, height)
+      imageData    = imageContext.getImageData(0, 0, width, height)
 
       for y in [0..(height - 1)]
         for x in [0..(width - 1)]
@@ -43,6 +51,5 @@ define [
             imageData.data[(x * 4) + (4 * width * y) + 2] = 125
             imageData.data[(x * 4) + (4 * width * y) + 3] = 255
 
-      context.scale(scaleX, scaleY)
       imageContext.putImageData(imageData, 0, 0)
-      context.drawImage(image, 0, 0)
+      context.drawImage(@rawImage, 0, 0)

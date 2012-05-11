@@ -1,7 +1,8 @@
 define [
+  "cs!canvas_renderer"
 ],
 
-() ->
+(Renderer) ->
 
   class Display
 
@@ -33,6 +34,7 @@ define [
       @width  = width
       @height = height
       @buffer = new Uint8Array(new ArrayBuffer((@width / 8) * @height))
+      @renderer = new Renderer
 
 
     buildFonts: ->
@@ -40,6 +42,10 @@ define [
       data = []
       data = data.concat(font) for own name, font of Display.FONTS
       data
+
+
+    render: ->
+      @renderer.renderBitmap @buffer.buffer, Display.WIDTH, Display.HEIGHT
 
 
     size: -> @byteWidth() * @height
@@ -97,6 +103,7 @@ define [
 
           bufferView.setUint16(target, existing ^ spriteData)
 
+      @render()
       !!collision
 
 

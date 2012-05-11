@@ -14,7 +14,7 @@ define [
     @STACK_START:       255
     @INSTRUCTION_SIZE:    2
     @TIMER_FREQUENCY:    60 # Hz
-    @CLOCK_FREQUENCY:   500 # ms
+    @CLOCK_SPEED:        10 # ms
 
     @REGISTER:
       V0: 0x00
@@ -129,7 +129,7 @@ define [
 
     run: ->
       @running = true
-      @pcInterval = setInterval(@cycle, Chip8.CLOCK_FREQUENCY)
+      @pcInterval = setInterval(@cycle, Chip8.CLOCK_SPEED)
 
 
     initMemory: -> @memory = new Uint8Array(new ArrayBuffer(Chip8.MEMORY_SIZE))
@@ -151,14 +151,24 @@ define [
       @registers[Chip8.REGISTER.SP] = Chip8.STACK_START
 
 
+    dump: ->
+      console.log "Memory Dump:",   @memory
+      console.log "Register Dump:", @registers
+      console.log "Display Dump:",  @display
+      console.log "Stack Dump:",    @stack
+      console.log "PC Dump:",       "0x#{@pc.toString(16)}"
+      console.log "I Dump:",        "0x#{@i.toString(16)}"
+
+
     load: (buffer) ->
       program = new Uint8Array buffer
       @memory.set program, Chip8.PROGRAM_START
 
 
     updateTimers: =>
-      secondsPassed = Chip8.CLOCK_FREQUENCY / 1000
-      step = Math.floor(secondsPassed * Chip8.TIMER_FREQUENCY)
+      #secondsPassed = Chip8.CLOCK_SPEED / 1000
+      #step = Math.floor(secondsPassed * Chip8.TIMER_FREQUENCY)
+      step = 5
 
       dt = @registers[Chip8.REGISTER.DT]
       st = @registers[Chip8.REGISTER.ST]
@@ -177,16 +187,18 @@ define [
     cycle: =>
       @updateTimers()
 
-      highByte = @memory[@pc]
-      lowByte  = @memory[@pc + 1]
-      instruction = (highByte << 8) | lowByte
+      for i in [0..10]
+        highByte = @memory[@pc]
+        lowByte  = @memory[@pc + 1]
+        instruction = (highByte << 8) | lowByte
 
-      #console.log "[#{@pc}] #{instruction.toString(16)}"
-      @operations[instruction >>> 12].call(this, instruction)
-      @pc += 2
+        #console.log "[#{@pc}] 0x#{instruction.toString(16)}"
+        #debugger
+        @operations[instruction >>> 12].call(this, instruction)
+        @pc += 2
 
-      running = false if @pc > Chip8.MEMORY_SIZE
-      clearInterval(@pcInterval) unless @running
+        running = false if @pc > Chip8.MEMORY_SIZE
+        clearInterval(@pcInterval) unless @running
 
 
     ret: ->
@@ -223,13 +235,13 @@ define [
     call: (addr) ->
       @registers[Chip8.REGISTER.SP] += 1
       @stack[@registers[Chip8.REGISTER.SP]] = @pc
-      @pc = addr
+      @pc = addr - 2
 
 
-    jp: (addr) -> @pc = addr
+    jp: (addr) -> @pc = addr - 2
 
 
-    jp_v0_addr: (addr) -> @pc = @registers[Chip8.REGISTER.V0] + addr
+    jp_v0_addr: (addr) -> @pc = (@registers[Chip8.REGISTER.V0] + addr) - 2
 
 
     se_reg_byte: (xReg, byte) -> @pc += 2 if @registers[xReg] == byte
