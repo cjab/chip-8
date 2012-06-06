@@ -4,11 +4,12 @@ define [
   "Backbone"
   "cs!lib/util"
   "cs!views/editor"
+  "cs!views/menu"
   "cs!models/program"
   "text!templates/main.html"
 ],
 
-($, _, Backbone, Util, EditorView, Program, mainTemplate) ->
+($, _, Backbone, Util, EditorView, MenuView, Program, mainTemplate) ->
 
   URL = window.webkitURL || window.URL
   BlobBuilder = window.BlobBuilder ||
@@ -27,6 +28,7 @@ define [
     initialize: ->
       @model      = new Program unless @model?
       @editorView = new EditorView model: @model
+      @menuView   = new MenuView
       @render()
       @model.on "change:blob",     @onChangeBlob
       @model.on "change:assembly", @onChangeAssembly
@@ -77,3 +79,4 @@ define [
       data = {}
       @$el.html @template(data)
       @$el.find(".editor").html @editorView.render()
+      @$el.find("#menu").html   @menuView.render()
