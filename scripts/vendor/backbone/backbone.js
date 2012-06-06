@@ -1,5 +1,5 @@
 define([
-  "order!lib/backbone/backbone-min"
+  "order!vendor/backbone/backbone-min"
 ], function() {
   _.noConflict();
   $.noConflict();

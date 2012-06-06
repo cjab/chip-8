@@ -1,7 +1,7 @@
 define [
   "jQuery"
-  "cs!chip8"
-  "cs!util"
+  "cs!lib/chip8"
+  "cs!lib/util"
 ],
 
 ($, Chip8, Util) ->

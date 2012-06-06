@@ -2,7 +2,7 @@ define [
   "jQuery"
   "Underscore"
   "Backbone"
-  "cs!util"
+  "cs!lib/util"
   "cs!views/editor"
   "cs!models/program"
   "text!templates/main.html"

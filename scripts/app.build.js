@@ -3,11 +3,11 @@
   baseUrl: "scripts",
   dir:     "../build",
   paths: {
-    cs:           "lib/require/csBuild",
-    csBuild:      "lib/require/cs",
-    CoffeeScript: "lib/coffeescript/coffeescript",
-    text:         "lib/require/text",
-    order:        "lib/require/order",
+    cs:           "vendor/require/csBuild",
+    csBuild:      "vendor/require/cs",
+    CoffeeScript: "vendor/coffeescript/coffeescript",
+    text:         "vendor/require/text",
+    order:        "vendor/require/order",
   },
   modules: [
     {

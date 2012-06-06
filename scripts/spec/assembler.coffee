@@ -1,5 +1,5 @@
 define [
-  "cs!assembler"
+  "cs!lib/assembler"
 ],
 
 (Assembler) ->

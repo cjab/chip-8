@@ -1,24 +1,24 @@
 require.config({
   paths: {
-    jQuery:       "lib/jquery/jquery",
-    Underscore:   "lib/underscore/underscore",
-    Backbone:     "lib/backbone/backbone",
-    CoffeeScript: "lib/coffeescript/coffeescript",
-    bootstrap:    "lib/bootstrap/bootstrap",
-    keyboard:     "lib/keyboard/keyboard",
-    cs:           "lib/require/cs",
-    text:         "lib/require/text",
-    order:        "lib/require/order",
+    jQuery:       "vendor/jquery/jquery",
+    Underscore:   "vendor/underscore/underscore",
+    Backbone:     "vendor/backbone/backbone",
+    CoffeeScript: "vendor/coffeescript/coffeescript",
+    bootstrap:    "vendor/bootstrap/bootstrap",
+    keyboard:     "vendor/keyboard/keyboard",
+    cs:           "vendor/require/cs",
+    text:         "vendor/require/text",
+    order:        "vendor/require/order",
     templates:    "../templates"
   }
 });
 
 define([
   "cs!app",
-  "order!lib/jquery/jquery-min",
-  "order!lib/underscore/underscore-min",
-  "order!lib/backbone/backbone-min",
-  "order!lib/bootstrap/bootstrap-min"
+  "order!vendor/jquery/jquery-min",
+  "order!vendor/underscore/underscore-min",
+  "order!vendor/backbone/backbone-min",
+  "order!vendor/bootstrap/bootstrap-min"
 ], function(App) {
   App.initialize();
 });

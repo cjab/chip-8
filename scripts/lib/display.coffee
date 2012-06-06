@@ -1,5 +1,5 @@
 define [
-  "cs!canvas_renderer"
+  "cs!lib/canvas_renderer"
 ],
 
 (Renderer) ->

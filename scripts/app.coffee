@@ -1,5 +1,5 @@
 define [
-  "cs!disassembler"
+  "cs!lib/disassembler"
   "cs!views/main"
 ],
 

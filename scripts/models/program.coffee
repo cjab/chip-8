@@ -1,9 +1,9 @@
 define [
   "Underscore"
   "Backbone"
-	"cs!util"
-  "cs!assembler"
-  "cs!disassembler"
+	"cs!lib/util"
+  "cs!lib/assembler"
+  "cs!lib/disassembler"
 ],
 
 (_, Backbone, Util, Assembler, Disassembler) ->

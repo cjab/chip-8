@@ -1,5 +1,5 @@
 define [
-  "cs!display"
+  "cs!lib/display"
 ],
 
 (Display) ->

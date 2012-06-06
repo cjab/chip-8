@@ -1,5 +1,5 @@
 define [
-  "parser"
+  "lib/parser"
 ],
 
 (parser) ->

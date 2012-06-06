@@ -1,6 +1,6 @@
 define [
   "jQuery"
-  "cs!util"
+  "cs!lib/util"
 ],
 
 ($, Util) ->

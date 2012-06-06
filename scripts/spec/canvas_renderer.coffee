@@ -1,8 +1,8 @@
 define [
   "jQuery"
-  "cs!chip8"
-  "cs!util"
-  "cs!canvas_renderer"
+  "cs!lib/chip8"
+  "cs!lib/util"
+  "cs!lib/canvas_renderer"
 ],
 
 ($, Chip8, Util, CanvasRenderer) ->

@@ -1,5 +1,5 @@
 define([
-  'order!lib/jquery/jquery-min'
+  'order!vendor/jquery/jquery-min'
 ], function() {
   return $;
 });
