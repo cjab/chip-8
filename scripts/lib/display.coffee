@@ -30,11 +30,8 @@ define [
       F: [ 0xf0, 0x80, 0xf0, 0x80, 0x80 ]
 
 
-    constructor: (width = Display.WIDTH, height = Display.HEIGHT) ->
-      @width  = width
-      @height = height
+    constructor: (@renderer, @width = Display.WIDTH, @height = Display.HEIGHT) ->
       @buffer = new Uint8Array(new ArrayBuffer((@width / 8) * @height))
-      @renderer = new Renderer
 
 
     buildFonts: ->

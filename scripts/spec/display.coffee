@@ -1,15 +1,16 @@
 define [
   "cs!lib/display"
+  "cs!lib/test_renderer"
 ],
 
-(Display) ->
+(Display, TestRenderer) ->
 
   describe "Display", ->
 
     display = null
 
     beforeEach ->
-      display = new Display
+      display = new Display(new TestRenderer)
 
 
     describe "#byteWidth", ->

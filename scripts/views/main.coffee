@@ -6,10 +6,11 @@ define [
   "cs!views/editor"
   "cs!views/menu"
   "cs!models/program"
+  "cs!lib/chip8"
   "text!templates/main.html"
 ],
 
-($, _, Backbone, Util, EditorView, MenuView, Program, mainTemplate) ->
+($, _, Backbone, Util, EditorView, MenuView, Program, Chip8, mainTemplate) ->
 
   URL = window.webkitURL || window.URL
   BlobBuilder = window.BlobBuilder ||
@@ -29,6 +30,7 @@ define [
       @model      = new Program unless @model?
       @editorView = new EditorView model: @model
       @menuView   = new MenuView
+      @emulator   = new Chip8
       @render()
       @model.on "change:blob",     @onChangeBlob
       @model.on "change:assembly", @onChangeAssembly

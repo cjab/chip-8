@@ -1,17 +1,18 @@
 define [
   "jQuery"
   "cs!lib/chip8"
+  "cs!lib/test_renderer"
   "cs!lib/util"
 ],
 
-($, Chip8, Util) ->
+($, Chip8, TestRenderer, Util) ->
 
   describe "Chip8", ->
 
     chip8 = null
 
     beforeEach ->
-      chip8 = new Chip8
+      chip8 = new Chip8(new TestRenderer)
 
 
     describe "#run", ->

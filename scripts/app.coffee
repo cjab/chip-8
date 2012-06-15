@@ -6,6 +6,6 @@ define [
 (Disassembler, MainView) ->
 
   initialize = ->
-    mainView = new MainView(el: 'body')
+    mainView = new MainView(el: 'body#main')
 
   return initialize: initialize

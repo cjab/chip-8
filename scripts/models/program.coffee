@@ -21,7 +21,7 @@ define [
       hex:      ""
       data:     new ArrayBuffer()
       blob:     null
-
+      keyMap:   null
 
     initialize: ->
       @on "change:data", @onChangeData

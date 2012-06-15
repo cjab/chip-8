@@ -38,7 +38,7 @@ define [
       ST: 0x12
 
 
-    @KEY_MAP:
+    @DEFAULT_KEY_MAP:
       0x0: "1"
       0x1: "2"
       0x2: "3"
@@ -116,11 +116,11 @@ define [
       0x65: (i) -> @ld_reg_start @xReg(i)
 
 
-    constructor: ->
+    constructor: (renderer, @keyMap = Chip8.DEFAULT_KEY_MAP) ->
       @initRegisters()
       @initMemory()
       @initStack()
-      @initDisplay()
+      @initDisplay(renderer)
       @initMemory()
       @initFonts()
 
@@ -138,7 +138,7 @@ define [
     initFonts: -> (new Uint8Array(@memory.buffer)).set @display.buildFonts()
 
 
-    initDisplay: -> @display = new Display()
+    initDisplay: (renderer) -> @display = new Display(renderer)
 
 
     initStack: -> @stack = new Uint16Array(new ArrayBuffer(Chip8.STACK_SIZE))
@@ -408,14 +408,14 @@ define [
     # being pressed.
     skp: (xReg) ->
       for key in Keyboard.activeKeys()
-        @pc += 2 if key == Chip8.KEY_MAP[@registers[xReg]]
+        @pc += 2 if key == @keyMap[@registers[xReg]]
 
 
     # Skip the next instruction if the key with value `xReg` is currently
     # NOT being pressed.
     sknp: (xReg) ->
       for key in Keyboard.activeKeys()
-        return if key == Chip8.KEY_MAP[@registers[xReg]]
+        return if key == @keyMap[@registers[xReg]]
       @pc += 2
 
 
@@ -427,7 +427,7 @@ define [
 
       @didGetInput = (event) =>
         keyPressed = String.fromCharCode(event.keyCode || event.keyLocation)
-        for own value, key of Chip8.KEY_MAP
+        for own value, key of @keyMap
           if key == keyPressed
             @waitingForInput  = false
             @registers[xReg]  = value
