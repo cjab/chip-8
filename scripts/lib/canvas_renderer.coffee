@@ -8,15 +8,10 @@ define [
   class CanvasRenderer
 
 
-    constructor: ->
+    constructor: (@$el) ->
       @rawImage = $("<canvas width='64' height='32' />")[0]
       @width  = 512
       @height = 256
-      if $("canvas#display").length > 0
-        @$el = $("canvas#display")
-      else
-        @$el = $("<canvas id='display' width='#{@width}' height='#{@height}' />")
-        $('body').prepend @$el
       context = @getContext()
       # TODO: Find a better way to scale the canvas
       context.scale 8, 8

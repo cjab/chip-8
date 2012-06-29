@@ -116,15 +116,20 @@ define [
       0x65: (i) -> @ld_reg_start @xReg(i)
 
 
-    constructor: (renderer, @keyMap = Chip8.DEFAULT_KEY_MAP) ->
+    constructor: (@renderer, @keyMap = Chip8.DEFAULT_KEY_MAP) -> @init()
+
+
+    init: ->
       @initRegisters()
       @initMemory()
       @initStack()
-      @initDisplay(renderer)
+      @initDisplay(@renderer)
       @initMemory()
       @initFonts()
-
       @waitingForInput = false
+
+
+    reset: -> @init()
 
 
     run: ->
