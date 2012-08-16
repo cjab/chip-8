@@ -8,7 +8,10 @@ define [
   class CanvasRenderer
 
 
-    constructor: (@$el) ->
+    $el: $("<canvas id='display' width='512' height='256' />")
+
+
+    constructor: ->
       @rawImage = $("<canvas width='64' height='32' />")[0]
       @width  = 512
       @height = 256

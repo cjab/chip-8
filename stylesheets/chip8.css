@@ -22,3 +22,7 @@
   direction: ltr;
   cursor: pointer;
 }
+
+.pixel { width: 8px; height: 8px; background-color: black; float: left; }
+.pixel-on { background-color: gray; }
+.pixel-row { clear: left; }

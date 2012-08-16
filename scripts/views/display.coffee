@@ -6,9 +6,10 @@ define [
   "cs!lib/util"
   "cs!lib/chip8"
   "cs!lib/canvas_renderer"
+  "cs!lib/dom_renderer"
 ],
 
-($, _, Backbone, Program, Util, Chip8, CanvasRenderer) ->
+($, _, Backbone, Program, Util, Chip8, CanvasRenderer, DOMRenderer) ->
 
   class DisplayView extends Backbone.View
 
@@ -19,9 +20,10 @@ define [
     initialize: ->
       @model = new Program unless @model?
       @model.on "change:data", @onProgramChange
-      @$el      = $("<canvas id='display' width='512' height='256' />")
-      @renderer = new CanvasRenderer(@$el)
+      # Default to DOMRenderer
+      @renderer = new DOMRenderer
       @emulator = new Chip8(@renderer)
+      @$el      = @renderer.$el
 
 
     onProgramChange: =>
@@ -40,6 +42,4 @@ define [
       @$el.show()
 
 
-    render: ->
-      console.log @$el
-      @$el
+    render: -> @$el

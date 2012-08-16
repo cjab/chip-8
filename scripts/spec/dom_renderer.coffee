@@ -2,15 +2,15 @@ define [
   "jQuery"
   "cs!lib/chip8"
   "cs!lib/util"
-  "cs!lib/canvas_renderer"
+  "cs!lib/dom_renderer"
 ],
 
-($, Chip8, Util, CanvasRenderer) ->
+($, Chip8, Util, DOMRenderer) ->
 
-  describe "CanvasRenderer", ->
+  describe "DOMRenderer", ->
 
     it "should work", ->
-      renderer = new CanvasRenderer
+      renderer = new DOMRenderer
       buffer = new ArrayBuffer(32 * 8)
       bitmap = new Uint8Array(buffer)
       bitmap[0]  = 0xf0

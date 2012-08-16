@@ -126,10 +126,13 @@ define [
       @initDisplay(@renderer)
       @initMemory()
       @initFonts()
+      @running = false
       @waitingForInput = false
 
 
-    reset: -> @init()
+    reset: ->
+      clearInterval(@pcInterval)
+      @init()
 
 
     run: ->

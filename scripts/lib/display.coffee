@@ -1,8 +1,7 @@
 define [
-  "cs!lib/canvas_renderer"
 ],
 
-(Renderer) ->
+() ->
 
   class Display
 
