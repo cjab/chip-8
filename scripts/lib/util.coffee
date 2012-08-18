@@ -5,6 +5,14 @@ define [
 
   class Util
 
+    @URL:         window.webkitURL ||
+                  window.URL
+
+    @BlobBuilder: window.BlobBuilder ||
+                  window.WebKitBlobBuilder ||
+                  window.MozBlobBuilder
+
+
     @flipEndianess: (buffer) ->
       input         = new Uint16Array(buffer)
       flippedBuffer = new ArrayBuffer buffer.byteLength
