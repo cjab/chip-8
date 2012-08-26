@@ -40,7 +40,6 @@ define [
 
 
     onGameSelected: (selected) =>
-      console.log selected.get("program"), selected.get("keyMap")
       @runEmulator selected.get("program"), selected.get("keyMap")
 
 
