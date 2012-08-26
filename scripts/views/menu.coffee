@@ -3,10 +3,14 @@ define [
   "Underscore"
   "Backbone"
   "cs!lib/util"
+  "cs!lib/assembler"
+  "cs!lib/disassembler"
+  "cs!views/games"
+  "cs!lib/chip8"
   "text!templates/menu.html"
 ],
 
-($, _, Backbone, Util, menuTemplate) ->
+($, _, Backbone, Util, Assembler, Disassembler, GamesView, Chip8, menuTemplate) ->
 
   class MenuView extends Backbone.View
 
@@ -14,14 +18,30 @@ define [
 
 
     events:
-      "click .download": "onDownload"
       "change .upload-assembly>input": "onUploadAssembly"
+      "click .download": "onDownload"
       "change .upload-binary>input":   "onUploadBinary"
 
 
     initialize: ->
-      @model.on "change:blob",     @onChangeBlob
-      @model.on "change:assembly", @onChangeAssembly
+      @emulator     = @options["emulator"]
+      @assembler    = new Assembler
+      @disassembler = new Disassembler
+
+      @gamesView = new GamesView
+      @gamesView.on "selected", @onGameSelected
+
+
+    runEmulator: (data, keyMap = Chip8.DEFAULT_KEY_MAP) =>
+      @emulator.reset()
+      @emulator.setKeyMap(keyMap)
+      @emulator.load(data)
+      @emulator.run()
+
+
+    onGameSelected: (selected) =>
+      console.log selected.get("program"), selected.get("keyMap")
+      @runEmulator selected.get("program"), selected.get("keyMap")
 
 
     onUploadBinary: (e) =>
@@ -30,8 +50,7 @@ define [
       reader = new FileReader()
       buffer = null
       reader.onloadend = (e) =>
-        console.log "HERE", @model
-        @model.set "data", Util.flipEndianess(e.target.result)
+        @runEmulator e.target.result
       reader.readAsArrayBuffer(file)
 
 
@@ -40,37 +59,37 @@ define [
       file = input.get(0).files[0]
       reader = new FileReader()
       buffer = null
-      reader.onloadend = (e) => @model.set "assembly", e.target.result
+      reader.onloadend = (e) =>
+        @runEmulator @assembler.toArrayBuffer(e.target.result)
       reader.readAsText(file)
 
 
     onDownload: (e) =>
-      @model.assemble()
-      @onChangeBlob()
-      @onChangeAssembly()
+      if @emulator.currentProgram
+        @_prepareBinary()
+        @_prepareAssembly()
 
 
-    onChangeBlob: =>
+    _prepareBinary: =>
       downloadBinary = @$el.find("a.download-binary")
-      binaryUrl      = Util.URL.createObjectURL @model.get("blob")
+      blobBuilder    = new Util.BlobBuilder
+      blobBuilder.append @emulator.currentProgram
+      binaryUrl      = Util.URL.createObjectURL blobBuilder.getBlob("application/octet-stream")
       downloadBinary.attr "href", binaryUrl
       downloadBinary.get(0).download = "out.bin"
 
 
-    onChangeAssembly: =>
+    _prepareAssembly: =>
       downloadAssembly = @$el.find("a.download-assembly")
       blobBuilder = new Util.BlobBuilder
-      blobBuilder.append @model.get("assembly")
+      blobBuilder.append @disassembler.run(@emulator.currentProgram).join("\n")?.replace("\n\n", "")
       assemblyUrl = Util.URL.createObjectURL blobBuilder.getBlob("text/plain")
       downloadAssembly.attr "href", assemblyUrl
       downloadAssembly.get(0).download = "out.asm"
 
 
     render: ->
-      data =
-        games: [
-          "Blinky"
-          "Pong"
-        ]
+      data = {}
       @$el.html @template(data)
+      @$el.find("#games").replaceWith @gamesView.render()
       @$el

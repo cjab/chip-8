@@ -1,7 +1,7 @@
 define [
   "Underscore"
   "Backbone"
-	"cs!lib/util"
+  "cs!lib/util"
   "cs!lib/assembler"
   "cs!lib/disassembler"
 ],

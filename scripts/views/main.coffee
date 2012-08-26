@@ -4,12 +4,13 @@ define [
   "Backbone"
   "cs!views/editor"
   "cs!views/menu"
+  "cs!views/display"
   "cs!models/program"
   "cs!lib/chip8"
   "text!templates/main.html"
 ],
 
-($, _, Backbone, EditorView, MenuView, Program, Chip8, mainTemplate) ->
+($, _, Backbone, EditorView, MenuView, DisplayView, Program, Chip8, mainTemplate) ->
 
   class MainView extends Backbone.View
 
@@ -17,15 +18,18 @@ define [
 
 
     initialize: ->
-      @model      = new Program unless @model?
-      @editorView = new EditorView model: @model
-      @menuView   = new MenuView   model: @model
-      @emulator   = new Chip8
+      @program  = @options["program"]
+      @renderer = @options["renderer"]
+      @emulator = @options["emulator"]
+
+      @displayView = new DisplayView  model: @renderer
+      @menuView    = new MenuView     model: @program, emulator: @emulator
+
       @render()
 
 
     render: ->
       data = {}
       @$el.html @template(data)
-      @$el.find(".editor").html @editorView.render()
-      @$el.find("#menu").html   @menuView.render()
+      @$el.find("#menu").html    @menuView.render()
+      @$el.find("#display").html @displayView.render()

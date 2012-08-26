@@ -9,7 +9,8 @@ require.config({
     cs:           "vendor/require/cs",
     text:         "vendor/require/text",
     order:        "vendor/require/order",
-    templates:    "../templates"
+    templates:    "../templates",
+    data:         "../data"
   }
 });
 

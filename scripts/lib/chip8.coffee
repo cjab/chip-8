@@ -42,12 +42,12 @@ define [
       0x0: "1"
       0x1: "2"
       0x2: "3"
-      0x3: "up"
+      0x3: "4"
       0x4: "q"
       0x5: "w"
-      0x6: "down"
-      0x7: "left"
-      0x8: "right"
+      0x6: "e"
+      0x7: "r"
+      0x8: "a"
       0x9: "s"
       0xa: "d"
       0xb: "f"
@@ -130,8 +130,13 @@ define [
       @waitingForInput = false
 
 
+    setKeyMap: (keyMap) -> @keyMap = keyMap
+
+
     reset: ->
       clearInterval(@pcInterval)
+      @running = false
+      @waitingForInput = false
       @init()
 
 
@@ -170,8 +175,13 @@ define [
       console.log "I Dump:",        "0x#{@i.toString(16)}"
 
 
+    # The program last loaded into memory
+    currentProgram: null
+
+
     # Load a program into memory.
     load: (buffer) ->
+      @currentProgram = buffer
       program = new Uint8Array buffer
       @memory.set program, Chip8.PROGRAM_START
 
