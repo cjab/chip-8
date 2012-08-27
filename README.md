@@ -1,12 +1,21 @@
 Chip-8
 ======
 
+Emulator
+----------------------
+
+A Chip-8 emulator written in CoffeeScript using ArrayBuffers, Blobs, and other
+features unlikely to work in your browser.  
+
+Try it out at: [http://chip-8.jabnix.net](http://chip-8.jabnix.net)
+
+
 Assembler/Disassembler
 ----------------------
 
 A Chip-8 assembler/disassembler implemented using ArrayBuffers. This has only
-been tested on Chrome 18 but it's likely to work on newer versions of Firefox
-as well. I'm pretty sure you're out of luck with IE.
+been tested on Chrome 18 but it may work on newer versions of Firefox as well.
+I'm pretty sure you're out of luck with IE.
 
 
 ### Use
