@@ -1,0 +1,26 @@
+.container { display: block; width: 600px; }
+.editor { margin-top: 80px; }
+.editor textarea { width: 600px; min-height: 300px; }
+.upload-assembly, .upload-binary {
+  position: relative;
+  overflow: hidden;
+  float: left;
+  width: 140px;
+}
+.upload-assembly input, .upload-binary input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  -moz-transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+  cursor: pointer;
+}
+.pixel { width: 8px; height: 8px; background-color: black; float: left; }
+.pixel-on { background-color: gray; }
+.pixel-row { clear: left; }
+#display { margin-top: 50px }
